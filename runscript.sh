@@ -1,16 +1,19 @@
 #!/bin/bash
 
-IBC_PATH=/opt/IBController
-LOG_PATH=/opt/IBController/Logs
-echo $IBC_PATH
-echo $LOG_PATH
+# Import github ssh keys if flag is set
+if [ ! -z ${SSH+x} ];
+then
+    echo "Configuring and setting up ssh"
+    mkdir /var/run/sshd
+    sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+    sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+    ssh-keygen -A
+    ssh-import-id-gh $SSH
+fi
 
-xvfb-daemon-run /opt/IBController/Scripts/DisplayBannerAndLaunch.sh &
-# Tail latest in log dir
-sleep 1
-tail -f $(find $LOG_PATH -maxdepth 1 -type f -printf "%T@ %p\n" | sort -n | tail -n 1 | cut -d' ' -f 2-) &
+# start up supervisord, all daemons should launched by supervisord.
+/usr/bin/supervisord -c /etc/supervisord.conf &
 
 # Give enough time for a connection before trying to expose on 0.0.0.0:4003
-sleep 30
 echo "Forking :::4001 onto 0.0.0.0:4003\n"
 socat TCP-LISTEN:4003,fork TCP:127.0.0.1:4001
