@@ -11,6 +11,12 @@ then
     ssh-import-id-gh $SSH
 fi
 
+# Set the correct tws path for supervisord
+export TWS_MAJOR_VRSN=$(ls ~/Jts/ibgateway/ | sed "s/.*\///")
+
+sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf
+
+
 # start up supervisord, all daemons should launched by supervisord.
 /usr/bin/supervisord -c /etc/supervisord.conf &
 
