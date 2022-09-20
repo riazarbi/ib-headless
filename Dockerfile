@@ -13,10 +13,7 @@ RUN apt-get update \
  && apt-get install -y \
     tigervnc-standalone-server \
     openbox \
-    #terminator \
     tint2 \
-    #pcmanfm \
-    #xfce4-terminal \
     supervisor \
     procps \
     curl \
@@ -33,7 +30,6 @@ RUN mkdir /root/.vnc
 #ADD etc/xdg/pcmanfm /root/.config/pcmanfm
 
 # IB TWS
-ENV TWS_MAJOR_VRSN=978
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get clean \
@@ -51,12 +47,14 @@ RUN mkdir -p /opt/TWS
 WORKDIR /opt/TWS
 RUN wget -q https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/ibgateway-stable-standalone-linux-x64.sh
 RUN chmod a+x ibgateway-stable-standalone-linux-x64.sh
-RUN yes n | /opt/TWS/ibgateway-stable-standalone-linux-x64.sh
+RUN yes '' | /opt/TWS/ibgateway-stable-standalone-linux-x64.sh
 
 WORKDIR /
 
 # Below files copied during build to enable operation without volume mount
 COPY ./ib/jts.ini /root/Jts/jts.ini
+
+#ENV TWS_MAJOR_VRSN $(ls /root/Jts/ibgateway/ | sed "s/.*\///")
 
 # Add run script and conf files
 ADD etc /etc
@@ -66,5 +64,4 @@ RUN chmod a+x runscript.sh
 ENTRYPOINT ["./runscript.sh"]
 
 EXPOSE 4003
-EXPOSE 5900
 EXPOSE 22
