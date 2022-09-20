@@ -27,7 +27,7 @@ docker run -it --rm --name broker --network ib -p 2222:22 -e SSH=<GITHUB_HANDLE>
 From your laptop: 
 
 ```bash
-sh -C -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null" -L 5900:localhost:5900 root@server -p 2222 &
+ssh -C -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null" -L 5900:localhost:5900 root@server -p 2222 &
 sleep 1
 vncviewer localhost:5900
 ```
