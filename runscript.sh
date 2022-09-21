@@ -9,10 +9,13 @@ then
     sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
     ssh-keygen -A
     ssh-import-id-gh $SSH
+    echo "You can ssh in to the container with something like the following:"
+    echo 'ssh -C -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null" -L 5900:localhost:5900 root@server -p 2222'
 fi
 
 # Set the correct tws path for supervisord
 export TWS_MAJOR_VRSN=$(ls ~/Jts/ibgateway/ | sed "s/.*\///")
+export DISPLAY=":0"
 
 sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf
 

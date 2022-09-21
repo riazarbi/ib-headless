@@ -12,6 +12,7 @@ RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y \
     tigervnc-standalone-server \
+#    xvfb \
     openbox \
     tint2 \
     supervisor \
@@ -19,15 +20,13 @@ RUN apt-get update \
     curl \
     openssh-server \
     ssh-import-id \
+#    xterm \
+    nano \
  && apt-get autoclean \
  && apt-get autoremove \
  && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /root/.vnc
-    #echo "root" | vncpasswd -f > /root/.vnc/passwd; \
-    #chmod 600 /root/.vnc/passwd
-
-#ADD etc/xdg/pcmanfm /root/.config/pcmanfm
 
 # IB TWS
 ENV DEBIAN_FRONTEND noninteractive
@@ -54,7 +53,20 @@ WORKDIR /
 # Below files copied during build to enable operation without volume mount
 COPY ./ib/jts.ini /root/Jts/jts.ini
 
-#ENV TWS_MAJOR_VRSN $(ls /root/Jts/ibgateway/ | sed "s/.*\///")
+# IBC
+ENV IBC_PKG_URL="https://github.com/IbcAlpha/IBC/releases/download/3.14.0/IBCLinux-3.14.0.zip" 
+
+ADD ${IBC_PKG_URL} /tmp/ibc.zip
+RUN mkdir -p /opt/ibc/logs \
+ && mkdir -p /root/ibc/logs \
+ && unzip /tmp/ibc.zip -d /opt/ibc/ \
+ && cd /opt/ibc/ \
+ && chmod o+x *.sh */*.sh \
+ && sed -i 's/     >> \"\${log_file}\" 2>\&1/     2>\&1/g' scripts/displaybannerandlaunch.sh \
+ && sed -i 's/light_red=.*/light_red=""/g' scripts/displaybannerandlaunch.sh \
+ && sed -i 's/light_green=.*/light_green=""/g' scripts/displaybannerandlaunch.sh \
+ && rm -f /tmp/ibc.zip \
+ && cp /opt/ibc/config.ini /root/ibc
 
 # Add run script and conf files
 ADD etc /etc
