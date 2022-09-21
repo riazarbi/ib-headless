@@ -71,6 +71,7 @@ RUN mkdir -p /opt/ibc/logs \
 # Add run script and conf files
 ADD etc /etc
 ADD runscript.sh ./
+ADD ibc/config.ini /root/ibc/config.ini
 RUN chmod a+x runscript.sh
 
 ENTRYPOINT ["./runscript.sh"]
