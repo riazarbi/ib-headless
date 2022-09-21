@@ -1,28 +1,41 @@
 # Interactive Brokers Gateway Docker
 
-IB Gateway running in Docker with VNC over ssh
+Interactive Brokers Gateway running in Docker. Ships with VNC over ssh for debugging.
 
+Running an environment for API access to Interactive Brokers is notoriously difficult. This docker image aims to make it possible to spin up an accessible IB API with a single docker command.
 
-## Usage
+## Ports
 
-The basic idea is that you run a standalone container running the IB gateway, and then interact with the IB API via a docker private network. 
+These are the services that will run when you spin up this container.
 
-## Example
+- ssh runs on port 22
+- vnc runs on port 5900
+- Interactive Brokers API port runs on 4003 _no matter whether it's runnin in paper or live mode_.
 
-### Build Image
+## Flags
 
-```bash
-docker build --tag riazarbi/ib-headless:no-controller .
+- SSH: github handle to import ssh keys from
+- USERNAME: IB username
+- PASSWORD: IB password
+- TRADINGMODE: paper or live
+
+You can either use the flags above to authenticate with IB, or you can mount in your own IBC `config.ini` file (example [here](https://github.com/IbcAlpha/IBC/blob/master/resources/config.ini)) at `/root/ibc/config.ini` in the container. The flags will overwrite anything in that location so use one or the other methods, not both.
+
+## Intended Usage
+
+### Expose the IB API but NOT ssh or VNC
+
+```
+docker run -it --rm --name broker  -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live ib
 ```
 
-### Create network and run container
+### Expose the VNC over ssh for interacting with gateway manually
 
-```bash
-docker network create ib
-docker run -it --rm --name broker --network ib -p 2222:22 -e SSH=<GITHUB_HANDLE> riazarbi/ib-headless:no-controller
+**DO NOT EXPOSE PORT 5900. IT IS NOT SECURED.**
+
 ```
-
-### VNC in to container to log in
+docker run -it --rm --name broker  -p 2222:22 -p 4003:4003 -e SSH=riazarbi -e USERNAME=rarbi1234 -e PASSWORD=wellthisishard1 -e TRADINGMODE=live ib
+```
 
 From your laptop: 
 
@@ -32,12 +45,16 @@ sleep 1
 vncviewer localhost:5900
 ```
 
-This should launch a VNC session where you can log in to IB. Note that you've only exposed ssh on the `broker` docker container, and that you need to have a private key to log in. 
+## What runs in this container?
 
-### Launch a container on the server to interact with the API
+The base image is `ubuntu:focal`.
 
-```bash
-docker run -it --rm --network ib random_container
-```
+On top of that we install `openbox` and `tint2`. 
 
+We run `tigervnc` on tp of that.
 
+We install IB `gateway` stable version directly from Interactive Brokers' website.
+
+We install `ibc` from [IBCAlpha](https://github.com/IbcAlpha/IBC) to control gateway.
+
+It all runs via `supervisor`.
