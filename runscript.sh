@@ -21,7 +21,7 @@ then
     printf "\n$cyan" '  ssh -C -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null" -L 5900:localhost:5900 root@server -p 2222'
     printf "\n$green" "Once you've ssh'ed in, you should be able to open up VNC with a command like so:"
     printf "\n$cyan" '  vncviewer localhost:5900'
-    printf "\n$red" "VNC authentication has been disabled because access is via ssh."
+    printf "\n$red" "VNC access is passwordless because access is via ssh."
 fi
 
 # Set the correct tws path for supervisord
