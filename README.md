@@ -10,16 +10,16 @@ These are the services that will run when you spin up this container.
 
 - ssh runs on port 22
 - vnc runs on port 5900
-- Interactive Brokers API port runs on 4003 _no matter whether it's runnin in paper or live mode_.
+- Interactive Brokers API port runs on 4003 _no matter whether it's running in paper mode or live mode_.
 
 ## Flags
 
-- SSH: github handle to import ssh keys from
-- USERNAME: IB username
-- PASSWORD: IB password
-- TRADINGMODE: paper or live
+- `SSH`: github handle to import ssh keys from
+- `USERNAME`: IB username
+- `PASSWORD`: IB password
+- `TRADINGMODE`: paper or live
 
-You can either use the flags above to authenticate with IB, or you can mount in your own IBC `config.ini` file (example [here](https://github.com/IbcAlpha/IBC/blob/master/resources/config.ini)) at `/root/ibc/config.ini` in the container. The flags will overwrite anything in that location so use one or the other methods, not both.
+You can either use the flags above to authenticate with IB, or you can mount in your own IBC `config.ini` file (example [here](https://github.com/IbcAlpha/IBC/blob/master/resources/config.ini)) at `/root/ibc/config.ini` in the container. The flags will overwrite anything in that location so use either the flags or the mount, not both.
 
 ## Intended Usage
 
@@ -34,7 +34,7 @@ docker run -it --rm --name broker  -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=i
 **DO NOT EXPOSE PORT 5900. IT IS NOT SECURED.**
 
 ```
-docker run -it --rm --name broker  -p 2222:22 -p 4003:4003 -e SSH=riazarbi -e USERNAME=rarbi1234 -e PASSWORD=wellthisishard1 -e TRADINGMODE=live ib
+docker run -it --rm --name broker  -p 2222:22 -p 4003:4003 -e SSH=riazarbi -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live ib
 ```
 
 From your laptop: 
@@ -51,7 +51,7 @@ The base image is `ubuntu:focal`.
 
 On top of that we install `openbox` and `tint2`. 
 
-We run `tigervnc` on tp of that.
+We run `tigervnc` on top of that.
 
 We install IB `gateway` stable version directly from Interactive Brokers' website.
 

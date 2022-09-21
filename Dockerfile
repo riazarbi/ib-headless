@@ -12,7 +12,6 @@ RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y \
     tigervnc-standalone-server \
-#    xvfb \
     openbox \
     tint2 \
     supervisor \
@@ -20,8 +19,6 @@ RUN apt-get update \
     curl \
     openssh-server \
     ssh-import-id \
-#    xterm \
-    nano \
  && apt-get autoclean \
  && apt-get autoremove \
  && rm -rf /var/lib/apt/lists/*
