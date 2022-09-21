@@ -47,7 +47,7 @@ vncviewer localhost:5900
 
 ## What runs in this container?
 
-The base image is `ubuntu:focal`.
+The base image is `debian:buster`.
 
 On top of that we install `openbox` and `tint2`. 
 
