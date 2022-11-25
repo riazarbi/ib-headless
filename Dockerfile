@@ -71,7 +71,7 @@ ADD runscript.sh ./
 ADD ibc/config.ini /root/ibc/config.ini
 RUN chmod a+x runscript.sh
 
-ENTRYPOINT ["./runscript.sh"]
+ENTRYPOINT ./runscript.sh
 
 EXPOSE 4003
 EXPOSE 22
