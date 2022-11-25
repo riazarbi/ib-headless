@@ -40,8 +40,9 @@ docker run -it --rm --name broker  -p 2222:22 -p 4003:4003 -e SSH=riazarbi -e US
 From your laptop: 
 
 ```bash
-ssh -C -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null" -L 5900:localhost:5900 root@server -p 2222 &
-sleep 1
+# in one terminal window
+ssh -C -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null" -L 5900:localhost:5900 root@server -p 2222
+# in another terminal window
 vncviewer localhost:5900
 ```
 
