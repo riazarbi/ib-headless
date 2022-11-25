@@ -32,6 +32,9 @@ printf "\n$cyan" "TWS VERSION INSTALLED: $TWS_MAJOR_VERSION"
 printf "\n$green" "Setting up IB supervisor path"
 sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf
 
+# Tell IBC what the TWS version is
+printf "\n$green" "Setting IB version in IBC opt file"
+sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
 
 # Set TWS username if flag is set
 if [ ! -z ${USERNAME+x} ];
