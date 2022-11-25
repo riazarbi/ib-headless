@@ -27,7 +27,9 @@ fi
 # Set the correct tws path for supervisord
 export TWS_MAJOR_VRSN=$(ls ~/Jts/ibgateway/ | sed "s/.*\///")
 export DISPLAY=":0"
+printf "\n$cyan" "TWS VERSION INSTALLED: $TWS_MAJOR_VERSION"
 
+printf "\n$green" "Setting up IB supervisor path"
 sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf
 
 
@@ -53,9 +55,11 @@ then
 fi
 
 # start up supervisord, all daemons should launched by supervisord.
+printf "\n$cyan" "Starting supervisord"
 /usr/bin/supervisord -c /etc/supervisord.conf &
 
 # Give enough time for a connection before trying to expose on 0.0.0.0:4003
+printf "\n$green" "Waiting 30 secondsa before forking IB API port to port 4003\n"
 sleep 30
 printf "\n$green" "Forking :::4001 onto 0.0.0.0:4003\n"
 socat TCP-LISTEN:4003,fork TCP:127.0.0.1:4001
