@@ -10,7 +10,7 @@ These are the services that will run when you spin up this container.
 
 - ssh runs on port 22
 - vnc runs on port 5900
-- Interactive Brokers API port runs on 4003 _no matter whether it's running in paper mode or live mode_.
+- Interactive Brokers API port runs on 4003 **no matter whether it's running in paper mode or live mode**.
 
 ## Flags
 
@@ -23,18 +23,18 @@ You can either use the flags above to authenticate with IB, or you can mount in 
 
 ## Intended Usage
 
-### Expose the IB API but NOT ssh or VNC
+### Method 1: Expose the IB API but NOT ssh or VNC
 
 ```
-docker run -it --rm --name broker  -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live ib
+docker run -it --rm --name broker  -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live riazarbi/ib-headless:latest
 ```
 
-### Expose the VNC over ssh for interacting with gateway manually
+### Method 2: Expose the VNC over ssh for interacting with gateway manually
 
 **DO NOT EXPOSE PORT 5900. IT IS NOT SECURED.**
 
 ```
-docker run -it --rm --name broker  -p 2222:22 -p 4003:4003 -e SSH=riazarbi -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live ib
+docker run -it --rm --name broker  -p 2222:22 -p 4003:4003 -e SSH=riazarbi -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live riazarbi/ib-headless:latest
 ```
 
 From your laptop: 
