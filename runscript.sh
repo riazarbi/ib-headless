@@ -27,7 +27,7 @@ fi
 # Set the correct tws path for supervisord
 export TWS_MAJOR_VRSN=$(ls ~/Jts/ibgateway/ | sed "s/.*\///")
 export DISPLAY=":0"
-printf "\n$cyan" "TWS VERSION INSTALLED: $TWS_MAJOR_VERSION"
+printf "\n$cyan" "TWS VERSION INSTALLED: $TWS_MAJOR_VRSN"
 
 printf "\n$green" "Setting up IB supervisor path"
 sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf
