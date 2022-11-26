@@ -7,7 +7,6 @@ ENV HOME /root
 ENV TZ Etc/UTC
 ENV SHELL /bin/bash
 ENV PS1='# '
-ENV DISPLAY=":0"
 
 RUN apt-get update \
  && apt-get upgrade -y \
@@ -88,5 +87,6 @@ RUN sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gate
 
 ENTRYPOINT ["./runscript.sh"]
 
+ENV DISPLAY=":0"
 EXPOSE 4003
 EXPOSE 22
