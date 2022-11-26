@@ -77,14 +77,13 @@ RUN   mkdir /var/run/sshd \
 &&    sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
 &&    sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 
-ENV TWS_MAJOR_VRSN=$(ls ~/Jts/ibgateway/ | sed "s/.*\///")
+ENV TWS_MAJOR_VRSN $(ls ~/Jts/ibgateway/ | sed "s/.*\///")
 RUN echo  "TWS VERSION INSTALLED: $TWS_MAJOR_VRSN"
 
 RUN sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf
 
 # Tell IBC what the TWS version is
-printf "\n$green" "Setting IB version in IBC opt file"
-sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
+RUN sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
 
 
 ENTRYPOINT ["./runscript.sh"]
