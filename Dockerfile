@@ -2,12 +2,16 @@ FROM debian:buster
 
 LABEL maintainer="Riaz Arbi <riazarbi@gmail.com>"
 
-# Openbox, vnc, ssh
-ENV HOME /root
+# Create broker user
+RUN useradd -mUs /bin/bash broker
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV HOME /home/broker
 ENV TZ Etc/UTC
 ENV SHELL /bin/bash
 ENV PS1='# '
 
+# Openbox, vnc, ssh
 RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y \
@@ -19,14 +23,16 @@ RUN apt-get update \
     curl \
     openssh-server \
     ssh-import-id \
+    nano \
  && apt-get autoclean \
  && apt-get autoremove \
  && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /root/.vnc
+USER broker
+RUN mkdir /home/broker/.vnc
+USER root
 
 # IB TWS
-ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get clean \
  && apt-get update \
@@ -38,37 +44,40 @@ RUN apt-get clean \
  && apt-get autoremove \
  && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /opt/TWS 
+RUN mkdir -p /opt/TWS \
+ && chown -R broker:broker /opt
 
+USER broker
 WORKDIR /opt/TWS
 RUN wget -q https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/ibgateway-stable-standalone-linux-x64.sh
 RUN chmod a+x ibgateway-stable-standalone-linux-x64.sh
 RUN yes '' | /opt/TWS/ibgateway-stable-standalone-linux-x64.sh
 
-WORKDIR /
+WORKDIR /home/broker
 
 # Below files copied during build to enable operation without volume mount
-COPY ./ib/jts.ini /root/Jts/jts.ini
+COPY ./ib/jts.ini /home/broker/Jts/jts.ini
 
 # IBC
 ENV IBC_PKG_URL="https://github.com/IbcAlpha/IBC/releases/download/3.14.0/IBCLinux-3.14.0.zip" 
 
-ADD ${IBC_PKG_URL} /tmp/ibc.zip
+RUN wget -q -O /home/broker/ibc.zip ${IBC_PKG_URL}
 RUN mkdir -p /opt/ibc/logs \
- && mkdir -p /root/ibc/logs \
- && unzip /tmp/ibc.zip -d /opt/ibc/ \
+ && mkdir -p /home/broker/ibc/logs \
+ && unzip /home/broker/ibc.zip -d /opt/ibc/ \
  && cd /opt/ibc/ \
  && chmod o+x *.sh */*.sh \
  && sed -i 's/     >> \"\${log_file}\" 2>\&1/     2>\&1/g' scripts/displaybannerandlaunch.sh \
  && sed -i 's/light_red=.*/light_red=""/g' scripts/displaybannerandlaunch.sh \
  && sed -i 's/light_green=.*/light_green=""/g' scripts/displaybannerandlaunch.sh \
- && rm -f /tmp/ibc.zip \
- && cp /opt/ibc/config.ini /root/ibc
+ && rm -f /home/broker/ibc.zip \
+ && cp /opt/ibc/config.ini /home/broker/ibc
 
 # Add run script and conf files
+USER root
 ADD etc /etc
 ADD runscript.sh ./
-ADD ibc/config.ini /root/ibc/config.ini
+ADD ibc/config.ini /home/broker/ibc/config.ini
 RUN chmod a+x runscript.sh
 
 # Modify configs for current IB and IBC version
@@ -76,17 +85,23 @@ RUN   mkdir /var/run/sshd \
 &&    sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
 &&    sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 
-ENV TWS_MAJOR_VRSN $(ls ~/Jts/ibgateway/ | sed "s/.*\///")
-RUN echo  "TWS VERSION INSTALLED: $TWS_MAJOR_VRSN"
-
-RUN sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf
+RUN export TWS_MAJOR_VRSN=$(ls /home/broker/Jts/ibgateway/ | sed "s/.*\///") \
+&&  echo  "TWS VERSION INSTALLED: $TWS_MAJOR_VRSN" \
+&& sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf \
 
 # Tell IBC what the TWS version is
-RUN sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
+&& sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
 
-
-ENTRYPOINT ["./runscript.sh"]
+# Fix permissions
+RUN touch /supervisor.log
+RUN chown -R broker:broker /home/broker 
+RUN chown -R broker:broker /opt
+RUN chmod -R +x /opt/ibc
 
 ENV DISPLAY=":0"
 EXPOSE 4003
 EXPOSE 22
+
+USER broker
+ENTRYPOINT ["./runscript.sh"]
+CMD ["/opt/ibc/gatewaystart.sh -inline"]

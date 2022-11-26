@@ -26,30 +26,29 @@ fi
 if [ ! -z ${USERNAME+x} ];
 then
     printf "\n$green" "Setting TWS username"
-    sed -i "/IbLoginId=/c\IbLoginId=$USERNAME" /root/ibc/config.ini
+    sed -i "/IbLoginId=/c\IbLoginId=$USERNAME" /home/broker/ibc/config.ini
 fi
 
 # Set TWS password if flag is set
 if [ ! -z ${PASSWORD+x} ];
 then
     printf "\n$green" "Setting TWS password"
-    sed -i "/IbPassword=/c\IbPassword=$PASSWORD" /root/ibc/config.ini
+    sed -i "/IbPassword=/c\IbPassword=$PASSWORD" /home/broker/ibc/config.ini
 fi
 
 # Set TWS username if flag is set
 if [ ! -z ${TRADINGMODE+x} ];
 then
     printf "\n$green" "Setting trading mode"
-    sed -i "/TradingMode=/c\TradingMode=$TRADINGMODE" /root/ibc/config.ini
+    sed -i "/TradingMode=/c\TradingMode=$TRADINGMODE" /home/broker/ibc/config.ini
 fi
 
 # start up supervisord, all daemons should launched by supervisord.
 printf "\n$cyan" "Starting supervisord"
-/usr/bin/supervisord -c /etc/supervisord.conf &
+/usr/bin/supervisord -c /etc/supervisord.conf
 
-# Give enough time for a connection before trying to expose on 0.0.0.0:4003
-printf "\n$green" "Waiting 30 seconds before forking IB API port to port 4003\n"
-sleep 30
-printf "\n$green" "Forking :::4001 onto 0.0.0.0:4003\n"
-socat TCP-LISTEN:4003,fork TCP:127.0.0.1:4001
+printf "\n$cyan" "Sleeping 5 seconds"
+sleep 3
 
+# needed to run parameters CMD
+$@

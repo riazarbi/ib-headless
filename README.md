@@ -4,13 +4,16 @@ Interactive Brokers Gateway running in Docker. Ships with VNC over ssh for debug
 
 Running an environment for API access to Interactive Brokers is notoriously difficult. This docker image aims to make it possible to spin up an accessible IB API with a single docker command.
 
+## NOTICE ##
+
+HEAD of this repo is in active development. The last working commit was https://github.com/riazarbi/ib-headless/tree/4416746e31afe55443de672686991820b0ef9bc8
+
 ## Ports
 
 These are the services that will run when you spin up this container.
 
 - ssh runs on port 22
 - vnc runs on port 5900
-- Interactive Brokers API port runs on 4003 **no matter whether it's running in paper mode or live mode**.
 
 ## Flags
 
@@ -41,7 +44,7 @@ From your laptop:
 
 ```bash
 # in one terminal window
-ssh -C -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null" -L 5900:localhost:5900 root@server -p 2222
+ssh -C -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null" -L 5900:localhost:5900 broker@server -p 2222
 # in another terminal window
 vncviewer localhost:5900
 ```
@@ -58,4 +61,4 @@ We install IB `gateway` stable version directly from Interactive Brokers' websit
 
 We install `ibc` from [IBCAlpha](https://github.com/IbcAlpha/IBC) to control gateway.
 
-It all runs via `supervisor`.
+It is all run by unprivileged user `broker`  via `supervisord`. 
