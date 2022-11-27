@@ -9,19 +9,6 @@ cyan='\e[1;36m%s\e[0m\n'
 
 export DISPLAY=":0"
 
-# Import github ssh keys if flag is set
-if [ ! -z ${SSH+x} ];
-then
-    ssh-keygen -A
-    ssh-import-id-gh $SSH
-    printf "\n$green" "You can ssh in to the container with something like the following:"
-    printf "\n$cyan" '  ssh -C -o StrictHostKeyChecking=no -o "UserKnownHostsFile /dev/null" -L 5900:localhost:5900 root@server -p 2222'
-    printf "\n$green" "Once you've ssh'ed in, you should be able to open up VNC with a command like so:"
-    printf "\n$cyan" '  vncviewer localhost:5900'
-    printf "\n$red" "VNC access is passwordless because access is via ssh."
-fi
-
-
 # Set TWS username if flag is set
 if [ ! -z ${USERNAME+x} ];
 then

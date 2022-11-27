@@ -11,7 +11,7 @@ ENV TZ Etc/UTC
 ENV SHELL /bin/bash
 ENV PS1='# '
 
-# Openbox, vnc, ssh
+# Openbox, vnc
 RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y \
@@ -21,9 +21,9 @@ RUN apt-get update \
     supervisor \
     procps \
     curl \
-    openssh-server \
-    ssh-import-id \
     nano \
+# maybe remove?
+   dbus-x11 \
  && apt-get autoclean \
  && apt-get autoremove \
  && rm -rf /var/lib/apt/lists/*
@@ -81,14 +81,9 @@ ADD ibc/config.ini /home/broker/ibc/config.ini
 RUN chmod a+x runscript.sh
 
 # Modify configs for current IB and IBC version
-RUN   mkdir /var/run/sshd \
-&&    sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
-&&    sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
-
 RUN export TWS_MAJOR_VRSN=$(ls /home/broker/Jts/ibgateway/ | sed "s/.*\///") \
 &&  echo  "TWS VERSION INSTALLED: $TWS_MAJOR_VRSN" \
 && sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf \
-
 # Tell IBC what the TWS version is
 && sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
 
@@ -97,11 +92,14 @@ RUN touch /supervisor.log
 RUN chown -R broker:broker /home/broker 
 RUN chown -R broker:broker /opt
 RUN chmod -R +x /opt/ibc
+WORKDIR "/home/broker"
+RUN ls -lh
 
 ENV DISPLAY=":0"
 EXPOSE 4003
 EXPOSE 22
 
 USER broker
+
 ENTRYPOINT ["./runscript.sh"]
 CMD ["/opt/ibc/gatewaystart.sh -inline"]
