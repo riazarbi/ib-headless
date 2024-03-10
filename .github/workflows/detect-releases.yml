@@ -53,6 +53,7 @@ jobs:
             ibgateway-*
 
       - name: Log in to the Container registry
+        if: ${{ steps.check-update.outputs.has_update == 'true' }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -60,9 +61,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
+        if: ${{ steps.check-update.outputs.has_update == 'true' }}
         run: |
-          docker build . --tag ghcr.io/riazarbi/${{ github.repository }}:${{ steps.version.outputs.build_version }}
-          docker push ghcr.io/riazarbi/${{ github.repository }}:${{ steps.version.outputs.build_version }}
+          docker build . --tag ${{ github.repository }}:${{ steps.version.outputs.build_version }}
+          docker push ghcr.io/${{ github.repository }}:${{ steps.version.outputs.build_version }}
 
 
 
