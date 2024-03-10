@@ -72,5 +72,5 @@ jobs:
           # Build context
           context: ${{ steps.channel.outputs.channel }}
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.version.outputs.build_version }}
           labels: ${{ steps.meta.outputs.labels }}
