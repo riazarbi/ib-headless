@@ -11,15 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
-      matrix:
-        channel: ["stable", "latest"]
     steps:
       - uses: actions/checkout@v3
 
       - name: Get Latest IB Gateway Version
         id: version
         run: |
-          res=$(curl -s https://download2.interactivebrokers.com/installers/ibgateway/${{ matrix.channel }}-standalone/version.json)
+          res=$(curl -s https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/version.json)
           build_version=$(grep -oP '(?<=buildVersion":")[^"]+' <<< "$res")
           echo "build_version=$build_version" >> $GITHUB_OUTPUT
 
@@ -28,7 +26,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release list | grep -qF '${{ steps.version.outputs.build_version }}-${{ matrix.channel }}'; then
+          if gh release list | grep -qF '${{ steps.version.outputs.build_version }}-stable'; then
             echo "has_update=false" >> $GITHUB_OUTPUT
           else
             echo "has_update=true" >> $GITHUB_OUTPUT
@@ -37,7 +35,7 @@ jobs:
       - name: Download IB Gateway
         if: ${{ steps.check-update.outputs.has_update == 'true' }}
         run: |
-          download_url='https://download2.interactivebrokers.com/installers/ibgateway/${{ matrix.channel }}-standalone/ibgateway-${{ matrix.channel }}-standalone-linux-x64.sh'
+          download_url='https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/ibgateway-stable-standalone-linux-x64.sh'
           dest='ibgateway-${{ steps.version.outputs.build_version }}-standalone-linux-x64.sh'
           curl -sSL "$download_url" --output "$dest"
           sha256sum "$dest" > "${dest}.sha256"
@@ -47,25 +45,25 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create '${{ steps.version.outputs.build_version }}-${{ matrix.channel }}' \
-            -t 'ibgateway ${{ steps.version.outputs.build_version }}-${{ matrix.channel }}' \
+          gh release create '${{ steps.version.outputs.build_version }}-stable' \
+            -t 'ibgateway ${{ steps.version.outputs.build_version }}-stable' \
             ibgateway-*
 
-      - name: Update ${{ matrix.channel }}
+      - name: Update stable
         if: ${{ steps.check-update.outputs.has_update == 'true' }}
-        run: ./build.sh ${{ matrix.channel }} ${{ steps.version.outputs.build_version }}
+        run: ./build.sh stable ${{ steps.version.outputs.build_version }}
 
       - name: Create PR
         if: ${{ steps.check-update.outputs.has_update == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          t_branch='update-${{ matrix.channel }}-to-${{ steps.version.outputs.build_version }}'
+          t_branch='update-stable-to-${{ steps.version.outputs.build_version }}'
           git config user.name github-actions
           git config user.email github-actions@github.com
           git pull
           git checkout -b "$t_branch" origin/master
-          git add '${{ matrix.channel }}'
-          git commit -m 'Update `${{ matrix.channel }}` to `${{ steps.version.outputs.build_version }}`'
+          git add 'stable'
+          git commit -m 'Update `stable` to `${{ steps.version.outputs.build_version }}`'
           git push --set-upstream origin "$t_branch"
           gh pr create --base master --fill
