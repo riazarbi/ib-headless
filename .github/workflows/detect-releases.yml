@@ -43,7 +43,7 @@ jobs:
       - name: Create release
         if: ${{ steps.check-update.outputs.has_update == 'true' }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.CR_TOKEN }}
         run: |
           gh release create '${{ steps.version.outputs.build_version }}-stable' \
             -t 'ibgateway ${{ steps.version.outputs.build_version }}-stable' \
@@ -54,7 +54,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CR_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v3
