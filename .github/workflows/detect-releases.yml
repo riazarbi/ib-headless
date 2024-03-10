@@ -60,7 +60,7 @@ jobs:
       - name: Build and push
         if: ${{ steps.check-update.outputs.has_update == 'true' }}
         run: |
-          docker build . --tag ${{ github.repository }}:${{ steps.version.outputs.build_version }}
+          docker build . --tag ghcr.io/${{ github.repository }}:${{ steps.version.outputs.build_version }}
           docker push ghcr.io/${{ github.repository }}:${{ steps.version.outputs.build_version }}
 
 
