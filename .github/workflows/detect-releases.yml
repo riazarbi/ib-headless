@@ -1,0 +1,71 @@
+name: Detect and Publish IB Gateway/TWS Releases
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  detect-release:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        channel: ["stable", "latest"]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get Latest IB Gateway Version
+        id: version
+        run: |
+          res=$(curl -s https://download2.interactivebrokers.com/installers/ibgateway/${{ matrix.channel }}-standalone/version.json)
+          build_version=$(grep -oP '(?<=buildVersion":")[^"]+' <<< "$res")
+          echo "build_version=$build_version" >> $GITHUB_OUTPUT
+
+      - name: Check Latest Version against Releases
+        id: check-update
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release list | grep -qF '${{ steps.version.outputs.build_version }}-${{ matrix.channel }}'; then
+            echo "has_update=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_update=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download IB Gateway
+        if: ${{ steps.check-update.outputs.has_update == 'true' }}
+        run: |
+          download_url='https://download2.interactivebrokers.com/installers/ibgateway/${{ matrix.channel }}-standalone/ibgateway-${{ matrix.channel }}-standalone-linux-x64.sh'
+          dest='ibgateway-${{ steps.version.outputs.build_version }}-standalone-linux-x64.sh'
+          curl -sSL "$download_url" --output "$dest"
+          sha256sum "$dest" > "${dest}.sha256"
+
+      - name: Create release
+        if: ${{ steps.check-update.outputs.has_update == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create '${{ steps.version.outputs.build_version }}-${{ matrix.channel }}' \
+            -t 'ibgateway ${{ steps.version.outputs.build_version }}-${{ matrix.channel }}' \
+            ibgateway-*
+
+      - name: Update ${{ matrix.channel }}
+        if: ${{ steps.check-update.outputs.has_update == 'true' }}
+        run: ./build.sh ${{ matrix.channel }} ${{ steps.version.outputs.build_version }}
+
+      - name: Create PR
+        if: ${{ steps.check-update.outputs.has_update == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          t_branch='update-${{ matrix.channel }}-to-${{ steps.version.outputs.build_version }}'
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git pull
+          git checkout -b "$t_branch" origin/master
+          git add '${{ matrix.channel }}'
+          git commit -m 'Update `${{ matrix.channel }}` to `${{ steps.version.outputs.build_version }}`'
+          git push --set-upstream origin "$t_branch"
+          gh pr create --base master --fill
