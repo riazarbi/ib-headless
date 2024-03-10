@@ -29,7 +29,7 @@ jobs:
       - name: Generate IB version tag
         id: version
         run: |
-          res=$(curl -s https://download2.interactivebrokers.com/installers/ibgateway/${{ matrix.channel }}-standalone/version.json)
+          res=$(curl -s https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/version.json)
           build_version=$(grep -oP '(?<=buildVersion":")[^"]+' <<< "$res")
           echo "build_version=$build_version" >> $GITHUB_OUTPUT
 
