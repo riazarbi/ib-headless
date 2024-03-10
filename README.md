@@ -1,21 +1,24 @@
 # Interactive Brokers Gateway Docker Image
 
-Interactive Brokers Gateway running in Docker. Ships with VNC over ssh for debugging.
+Interactive Brokers Gateway running in Docker. Ships with VNC via NoVNC for debugging. 
 
 Running an environment for API access to Interactive Brokers is notoriously difficult. This docker image aims to make it possible to spin up an accessible IB API with a single docker command.
 
 # Releases and Packages
 
-Every time Interactive Brokers release a new stable version of the Gateway, we download it and save it under releases. SO you can use this repo's releases to install a particular verion of the Gateway. 
+Every time Interactive Brokers release a new stable version of the Gateway, we download it and save it under releases. You can use this repo releases page to install a particular verion of the Gateway. 
 
-When we detect a new release, we also build a new docker image, and tag it with the release version. Check outt he tags under the 'packages' section of this repo.
+When we detect a new release, we also build a new docker image, and tag it with the release version. Check out the tags under the 'packages' section of this repo.
 
 ## Ports
 
 These are the services that will run when you spin up this container.
 
-- vnc runs on port 5900
-- 
+- An unauthenticated VNC server is running at port 5900.
+- NoVNC will expose an unauthenticated web page at port 6080 that shows the desktop of the `broker` user. You can use this to debug the gateway.
+- Regardless of whether you are using a live or paper account, the API will be accessible on port 4003.
+
+**!!IF YOU EXPOSE PORT 6080 or port 5900 ANYONE CAN ACCESS YOUR USER. ONLY EXPOSE PORT 5900 OR 6080 IF YOU ARE A SECURE ENVIRONMENT.!!**
 
 ## Flags
 
@@ -23,29 +26,20 @@ These are the services that will run when you spin up this container.
 - `PASSWORD`: IB password
 - `TRADINGMODE`: paper or live
 
-You can either use the flags above to authenticate with IB, or you can mount in your own IBC `config.ini` file (example [here](https://github.com/IbcAlpha/IBC/blob/master/resources/config.ini)) at `/root/ibc/config.ini` in the container. The flags will overwrite anything in that location so use either the flags or the mount, not both.
 
 ## Intended Usage
 
 ### In day to day use: Expose the IB API but NOT ssh or VNC
 
 ```
-docker run -it --rm --name broker  -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live ghcr.io/riazarbi/ib-headless:10.19.2j
+docker run -it --rm --name broker  -p 4003:4003 -p 6080:6080 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=paper ghcr.io/riazarbi/ib-headless:10.19.2j
 ```
 
 ### Insecure, for debugging: Expose the VNC  for interacting with gateway manually
 
-**!!IF YOU EXPOSE PORT 5900 ANYONE CAN ACCESS YOUR USER. ONLY EXPOSE PORT 5900 IF YOU ARE A SECURE ENVIRONMENT.!!**
 
 ```
-docker run -it --rm --name broker  -p 5900:5900 -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live  ghcr.io/riazarbi/ib-headless:10.19.2j
-```
-
-From your laptop: 
-
-```bash
-# in another terminal window
-vncviewer server-ip:5900
+docker run -it --rm --name broker  -p 4003:4003 -p 6080:6080 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=paper ghcr.io/riazarbi/ib-headless:10.19.2j
 ```
 
 ## What runs in this container?
@@ -55,6 +49,8 @@ The base image is `debian:stable`.
 On top of that we install `openbox` and `tint2`. 
 
 We run `tigervnc` on top of that.
+
+We use `websockify` to link `NoVNC` to the VNC server.
 
 We install IB `gateway` stable version directly from Interactive Brokers' website.
 
