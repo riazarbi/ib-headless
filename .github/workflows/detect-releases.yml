@@ -8,9 +8,6 @@ on:
 
 jobs:
   detect-release:
-    permissions:
-      contents: read
-      packages: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
