@@ -43,7 +43,7 @@ jobs:
       - name: Create release
         if: ${{ steps.check-update.outputs.has_update == 'true' }}
         env:
-          GH_TOKEN: ${{ secrets.CR_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create '${{ steps.version.outputs.build_version }}-stable' \
             -t 'ibgateway ${{ steps.version.outputs.build_version }}-stable' \
@@ -55,15 +55,21 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.CR_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
-        if: ${{ steps.check-update.outputs.has_update == 'true' }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+
+      - name: Build and push Docker images
         uses: docker/build-push-action@v3
         with:
+          context: .
           push: true
           tags: ${{ steps.version.outputs.build_version }}
-
-
+          labels: ${{ steps.meta.outputs.labels }}
 
 
