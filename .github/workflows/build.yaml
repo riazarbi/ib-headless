@@ -1,4 +1,4 @@
-name: docker_build
+name: Build new docker image
 
 on:
   workflow_dispatch:
@@ -25,12 +25,20 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Generate IB version tag
+        id: version
+        run: |
+          res=$(curl -s https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/version.json)
+          IB_TAG=$(grep -oP '(?<=buildVersion":")[^"]+' <<< "$res")
+          echo '::set-output name=ib_tag::'$IB_TAG
+
       -
         name: Generate tag
         id: gen_tag
         run: |
-          TAG=$(printf '%(%Y%m%d%H%M%S)T\n' -1)
-          echo '::set-output name=tag::'$TAG
+          DATE_TAG=$(printf '%(%Y%m%d%H%M%S)T\n' -1)
+          echo '::set-output name=date_tag::'$DATE_TAG
       -
         name: Build and push
         uses: docker/build-push-action@v2
@@ -38,5 +46,6 @@ jobs:
           context: .
           push: true
           tags: |
-              riazarbi/ib-headless:${{ fromJson(steps.gen_tag.outputs.tag) }}
+              riazarbi/ib-headless:${{ fromJson(steps.gen_tag.outputs.ib_tag) }}
+              riazarbi/ib-headless:${{ fromJson(steps.gen_tag.outputs.date_tag) }}
               riazarbi/ib-headless:latest
