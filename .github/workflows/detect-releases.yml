@@ -49,21 +49,19 @@ jobs:
             -t 'ibgateway ${{ steps.version.outputs.build_version }}-stable' \
             ibgateway-*
 
-      - name: Update stable
-        if: ${{ steps.check-update.outputs.has_update == 'true' }}
-        run: ./build.sh stable ${{ steps.version.outputs.build_version }}
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create PR
-        if: ${{ steps.check-update.outputs.has_update == 'true' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          t_branch='update-stable-to-${{ steps.version.outputs.build_version }}'
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git pull
-          git checkout -b "$t_branch" origin/master
-          git add 'stable'
-          git commit -m 'Update `stable` to `${{ steps.version.outputs.build_version }}`'
-          git push --set-upstream origin "$t_branch"
-          gh pr create --base master --fill
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ${{ steps.version.outputs.build_version }}
+
+
+
+
