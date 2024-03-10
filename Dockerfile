@@ -22,6 +22,8 @@ RUN apt-get update \
     procps \
     curl \
     nano \
+    novnc \
+    websockify \
 # maybe remove?
    dbus-x11 \
  && apt-get autoclean \
@@ -54,9 +56,6 @@ RUN chmod a+x ibgateway-stable-standalone-linux-x64.sh
 RUN yes '' | /opt/TWS/ibgateway-stable-standalone-linux-x64.sh
 
 WORKDIR /home/broker
-
-# Below files copied during build to enable operation without volume mount
-COPY ./ib/jts.ini /home/broker/Jts/jts.ini
 
 # IBC
 ENV IBC_PKG_URL="https://github.com/IbcAlpha/IBC/releases/download/3.18.0-Update.1/IBCLinux-3.18.0.zip" 

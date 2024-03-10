@@ -1,20 +1,21 @@
-# Interactive Brokers Gateway Docker
+# Interactive Brokers Gateway Docker Image
 
 Interactive Brokers Gateway running in Docker. Ships with VNC over ssh for debugging.
 
 Running an environment for API access to Interactive Brokers is notoriously difficult. This docker image aims to make it possible to spin up an accessible IB API with a single docker command.
 
-## NOTICE ##
+# Releases and Packages
 
-HEAD of this repo is in active development. At the moment, HEAD works great, but if you expose the VNC port it is unsecured. Exposing the VNC port is not needed, and discouraged. But it can be used for debugging purposes in a secure environment.
+Every time Interactive Brokers release a new stable version of the Gateway, we download it and save it under releases. SO you can use this repo's releases to install a particular verion of the Gateway. 
 
-The last working commit with ssh protection of VNC was https://github.com/riazarbi/ib-headless/tree/4416746e31afe55443de672686991820b0ef9bc8 , but the user running everything is root.
+When we detect a new release, we also build a new docker image, and tag it with the release version. Check outt he tags under the 'packages' section of this repo.
 
 ## Ports
 
 These are the services that will run when you spin up this container.
 
 - vnc runs on port 5900
+- 
 
 ## Flags
 
@@ -26,18 +27,18 @@ You can either use the flags above to authenticate with IB, or you can mount in 
 
 ## Intended Usage
 
-### Method 1: Expose the IB API but NOT ssh or VNC
+### In day to day use: Expose the IB API but NOT ssh or VNC
 
 ```
-docker run -it --rm --name broker  -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live riazarbi/ib-headless:latest
+docker run -it --rm --name broker  -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live ghcr.io/riazarbi/ib-headless:10.19.2j
 ```
 
-### Method 2: Expose the VNC  for interacting with gateway manually
+### Insecure, for debugging: Expose the VNC  for interacting with gateway manually
 
 **!!IF YOU EXPOSE PORT 5900 ANYONE CAN ACCESS YOUR USER. ONLY EXPOSE PORT 5900 IF YOU ARE A SECURE ENVIRONMENT.!!**
 
 ```
-docker run -it --rm --name broker  -p 5900:5900 -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live riazarbi/ib-headless:latest
+docker run -it --rm --name broker  -p 5900:5900 -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=live  ghcr.io/riazarbi/ib-headless:10.19.2j
 ```
 
 From your laptop: 
@@ -49,7 +50,7 @@ vncviewer server-ip:5900
 
 ## What runs in this container?
 
-The base image is `debian:buster`.
+The base image is `debian:stable`.
 
 On top of that we install `openbox` and `tint2`. 
 
