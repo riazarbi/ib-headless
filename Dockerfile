@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:stable
 
 LABEL maintainer="Riaz Arbi <riazarbi@gmail.com>"
 
@@ -59,7 +59,7 @@ WORKDIR /home/broker
 COPY ./ib/jts.ini /home/broker/Jts/jts.ini
 
 # IBC
-ENV IBC_PKG_URL="https://github.com/IbcAlpha/IBC/releases/download/3.14.0/IBCLinux-3.14.0.zip" 
+ENV IBC_PKG_URL="https://github.com/IbcAlpha/IBC/releases/download/3.18.0/IBCLinux-3.18.0.zip" 
 
 RUN wget -q -O /home/broker/ibc.zip ${IBC_PKG_URL}
 RUN mkdir -p /opt/ibc/logs \
