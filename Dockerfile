@@ -24,6 +24,7 @@ RUN apt-get update \
     nano \
     novnc \
     websockify \
+    git \
 # maybe remove?
    dbus-x11 \
  && apt-get autoclean \
