@@ -32,14 +32,14 @@ These are the services that will run when you spin up this container.
 ### In day to day use: Expose the IB API but NOT ssh or VNC
 
 ```
-docker run -it --rm --name broker  -p 4003:4003 -p 6080:6080 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=paper ghcr.io/riazarbi/ib-headless:10.19.2j
+docker run -it --rm --name broker  -p 4003:4003 -p 6080:6080 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=paper ghcr.io/riazarbi/ib-headless:10.19.2k
 ```
 
 ### Insecure, for debugging: Expose the VNC  for interacting with gateway manually
 
 
 ```
-docker run -it --rm --name broker  -p 4003:4003 -p 6080:6080 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=paper ghcr.io/riazarbi/ib-headless:10.19.2j
+docker run -it --rm --name broker  -p 4003:4003 -p 6080:6080 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=paper ghcr.io/riazarbi/ib-headless:10.19.2k
 ```
 
 ## What runs in this container?
