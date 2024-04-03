@@ -35,7 +35,7 @@ USER broker
 RUN mkdir /home/broker/.vnc
 USER root
 
-# IB TWS
+# IB TWS ################################
 
 RUN apt-get clean \
  && apt-get update \
@@ -58,7 +58,7 @@ RUN yes '' | /opt/TWS/ibgateway-stable-standalone-linux-x64.sh
 
 WORKDIR /home/broker
 
-# IBC
+# IBC ##################################
 ENV IBC_PKG_URL="https://github.com/IbcAlpha/IBC/releases/download/3.18.0-Update.1/IBCLinux-3.18.0.zip" 
 
 RUN wget -q -O /home/broker/ibc.zip ${IBC_PKG_URL}
@@ -87,7 +87,13 @@ RUN export TWS_MAJOR_VRSN=$(ls /home/broker/Jts/ibgateway/ | sed "s/.*\///") \
 # Tell IBC what the TWS version is
 && sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
 
-# Fix permissions
+# TWS API CLIENT ##########################
+ENV TWSAPI_CLIENT="https://interactivebrokers.github.io/downloads/twsapi_macunix.1019.04.zip"
+RUN wget -q -O /home/broker/twsclient.zip ${TWSAPI_CLIENT} \
+ && unzip /home/broker/twsclient.zip -d /home/broker/twsclient \
+ && cd /home/broker/twsclient/IBJts/source/pythonclient && python3 setup.py install
+
+# Fix permissions #########################
 RUN touch /supervisor.log
 RUN chown -R broker:broker /home/broker 
 RUN chown -R broker:broker /opt
