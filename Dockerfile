@@ -59,7 +59,7 @@ RUN yes '' | /opt/TWS/ibgateway-stable-standalone-linux-x64.sh
 WORKDIR /home/broker
 
 # IBC ##################################
-ENV IBC_PKG_URL="https://github.com/IbcAlpha/IBC/releases/download/3.18.0-Update.1/IBCLinux-3.18.0.zip" 
+ENV IBC_PKG_URL="https://github.com/IbcAlpha/IBC/releases/download/3.20.0/IBCLinux-3.20.0.zip" 
 
 RUN wget -q -O /home/broker/ibc.zip ${IBC_PKG_URL}
 RUN mkdir -p /opt/ibc/logs \
@@ -88,7 +88,7 @@ RUN export TWS_MAJOR_VRSN=$(ls /home/broker/Jts/ibgateway/ | sed "s/.*\///") \
 && sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
 
 # TWS API CLIENT ##########################
-ENV TWSAPI_CLIENT="https://interactivebrokers.github.io/downloads/twsapi_macunix.1019.04.zip"
+ENV TWSAPI_CLIENT="https://interactivebrokers.github.io/downloads/twsapi_macunix.1030.01.zip"
 RUN wget -q -O /home/broker/twsclient.zip ${TWSAPI_CLIENT} \
  && unzip /home/broker/twsclient.zip -d /home/broker/twsclient \
  && cd /home/broker/twsclient/IBJts/source/pythonclient && python3 setup.py install
