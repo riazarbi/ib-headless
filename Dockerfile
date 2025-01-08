@@ -85,7 +85,7 @@ RUN export TWS_MAJOR_VRSN=$(ls /home/broker/Jts/ibgateway/ | sed "s/.*\///") \
 &&  echo  "TWS VERSION INSTALLED: $TWS_MAJOR_VRSN" \
 && sed -i "/ibgateway/c\command=/root/Jts/ibgateway/$TWS_MAJOR_VRSN/ibgateway" /etc/supervisord.conf \
 # Tell IBC what the TWS version is
-&& sed -i "/TWS_MAJOR_VRSN=1012/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
+&& sed -i "/TWS_MAJOR_VRSN=/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
 
 # TWS API CLIENT ##########################
 ENV TWSAPI_CLIENT="https://interactivebrokers.github.io/downloads/twsapi_macunix.1030.01.zip"
