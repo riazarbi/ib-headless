@@ -29,7 +29,14 @@ These are the services that will run when you spin up this container.
 
 ## Intended Usage
 
-### In day to day use: Expose the IB API but NOT the VNC web page
+### Launch the container and enter your credentials in the prompt
+
+```
+docker run -it --rm --name broker  -p 4003:4003 ghcr.io/riazarbi/ib-headless:10.30.1t
+```
+
+
+### Launch the container and log in with no user input
 
 ```
 docker run -it --rm --name broker  -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=paper ghcr.io/riazarbi/ib-headless:10.30.1t
@@ -40,6 +47,8 @@ docker run -it --rm --name broker  -p 4003:4003 -e USERNAME=ibuser -e PASSWORD=i
 ```
 docker run -it --rm --name broker  -p 4003:4003 -p 6080:6080 -e USERNAME=ibuser -e PASSWORD=ibpasswd -e TRADINGMODE=paper ghcr.io/riazarbi/ib-headless:10.30.1t
 ```
+
+After launch, navigate to http://localhost:6080 to view the IB login window
 
 
 ## What runs in this container?
@@ -52,4 +61,4 @@ docker run -it --rm --name broker  -p 4003:4003 -p 6080:6080 -e USERNAME=ibuser 
 - We install `ibc` from [IBCAlpha](https://github.com/IbcAlpha/IBC) to control gateway.
 - We use `socat` to relay external calls to the IB API to the gateway. This circumvents the localhost restriction on API access and allows any IP address to access the API.
 
-It is all run by unprivileged user `broker`  via `supervisord`. 
+It is all run by unprivileged user `broker` via `supervisord`. 
