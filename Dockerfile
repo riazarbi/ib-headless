@@ -32,7 +32,7 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 USER broker
-RUN mkdir /home/broker/.vnc
+RUN mkdir -p /home/broker/.config/tigervnc
 USER root
 
 # IB TWS ################################
