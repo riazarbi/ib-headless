@@ -88,10 +88,12 @@ RUN export TWS_MAJOR_VRSN=$(ls /home/broker/Jts/ibgateway/ | sed "s/.*\///") \
 && sed -i "/TWS_MAJOR_VRSN=/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
 
 # TWS API CLIENT ##########################
-ENV TWSAPI_CLIENT="https://interactivebrokers.github.io/downloads/twsapi_macunix.1030.01.zip"
+ENV TWSAPI_CLIENT="https://interactivebrokers.github.io/downloads/twsapi_macunix.1037.02.zip"
 RUN wget -q -O /home/broker/twsclient.zip ${TWSAPI_CLIENT} \
  && unzip /home/broker/twsclient.zip -d /home/broker/twsclient \
- && cd /home/broker/twsclient/IBJts/source/pythonclient && python3 setup.py install
+ && chmod -R 777 /home/broker/twsclient/IBJts/source/pythonclient \
+ && cd /home/broker/twsclient/IBJts/source/pythonclient \
+ && python3 -m pip install .
 
 # Fix permissions #########################
 RUN touch /supervisor.log
