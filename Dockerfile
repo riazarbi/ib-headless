@@ -43,6 +43,7 @@ RUN apt-get clean \
     wget \
     unzip \
     socat \
+    python3-pip \
  && apt-get autoclean \
  && apt-get autoremove \
  && rm -rf /var/lib/apt/lists/*
