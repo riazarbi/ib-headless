@@ -43,7 +43,7 @@ RUN apt-get clean \
     wget \
     unzip \
     socat \
-    python3-pip \
+    python3-venv \
  && apt-get autoclean \
  && apt-get autoremove \
  && rm -rf /var/lib/apt/lists/*
@@ -89,14 +89,19 @@ RUN export TWS_MAJOR_VRSN=$(ls /home/broker/Jts/ibgateway/ | sed "s/.*\///") \
 && sed -i "/TWS_MAJOR_VRSN=/c\TWS_MAJOR_VRSN=$TWS_MAJOR_VRSN" /opt/ibc/gatewaystart.sh
 
 # TWS API CLIENT ##########################
+USER broker
 ENV TWSAPI_CLIENT="https://interactivebrokers.github.io/downloads/twsapi_macunix.1037.02.zip"
+ENV VIRTUAL_ENV=/home/broker/venv
+ENV PATH="/home/broker/venv/bin:$PATH"
 RUN wget -q -O /home/broker/twsclient.zip ${TWSAPI_CLIENT} \
  && unzip /home/broker/twsclient.zip -d /home/broker/twsclient \
  && chmod -R 777 /home/broker/twsclient/IBJts/source/pythonclient \
+ && python3 -m venv $VIRTUAL_ENV \
  && cd /home/broker/twsclient/IBJts/source/pythonclient \
- && python3 -m pip install .
+ && pip install .
 
 # Fix permissions #########################
+USER root
 RUN touch /supervisor.log
 RUN chown -R broker:broker /home/broker 
 RUN chown -R broker:broker /opt
